@@ -1,0 +1,40 @@
+// This is your Prisma schema file, ( This Folder specified the structure of our database )
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+// everytime we modify this schema file or the initial setup 
+// we must run/rerun this command `npx prisma generate`
+
+generator client {
+    provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// model is for Conversion between SQL db and JS
+// we need to create model for SQL to intrepet these tables
+// this is like predefining what a table is going to look like
+
+model User {
+    id          Int         @id @default(autoincrement()) 
+    username    String      @unique
+    password    String      
+    todos       Todo[]
+}
+
+// this is the model we are going to use to interact with js using js syntax
+
+model Todo {
+    id          Int         @id @default(autoincrement())
+    task        String      
+    completed   Boolean     @default(false) 
+    userId      Int         
+    user        User        @relation(fields: [userId], references: [id])
+}
+
+

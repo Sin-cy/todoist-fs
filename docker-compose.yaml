@@ -1,0 +1,36 @@
+# This file is for Docker Configs
+# setup individual containers - tells docker how to boot up every single container in our application
+
+version: '3'
+
+# this is where we define the configs for all of our containers
+services:
+  app:
+    build: . # build is used when we have the Dockerfile to build a container in the specified path directory
+    container_name: todo-app
+    environment:  # specifying the environmen vairables from this file without having a .env
+      - DATABASE_URL=postgresql://postgres:postgres@db:5432/todoapp # DATABASE_URL that we have setup inside the Prisma Schema
+      - JWT_SECRET=your_jwt_secret_here
+      - NODE_ENV=development # dev,prod etc.
+      - PORT=8000
+    ports: # portmapping maps an EXTERNAL port to an INTERNAL port
+      - "8000:8000" 
+    depends_on:
+      - db
+    volumes: # persist the db history record of our server state. Without this every bootup would be blank.
+      - .:/app 
+
+  db:
+    image: postgres:13-alpine
+    container_name: postgres-db 
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: todoapp 
+    ports: # convention ports EXTERNAL to INTERNAL
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data 
+
+volumes:
+  postgres-data:
